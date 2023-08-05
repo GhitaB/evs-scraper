@@ -19,7 +19,9 @@ BOOKS_CATEGORIES = [
     "fictiune",
 ]
 LIMIT_MAX_PRICE = None  # use None for no limit
-EXCLUDE_DUPLICATE = True  # True: include only books you don't have
+EXCLUDE_DUPLICATE = False  # True: include only books you don't have
+HARD_EXCLUDE = False  # True: use OR instead of AND in expression title-author
+USE_BLACKLIST_AS_WHITELIST = False  # True: if you want to see only the books you have
 
 def human_readable_category(category):
     return category.capitalize().replace("-", " ")
@@ -59,14 +61,12 @@ def get_category_details(category):
     books = soup.findAll("div", {"class": "hikashop_product"})
     books_list = []
 
+    BOOKS_I_HAVE = ""
     try:
-        if EXCLUDE_DUPLICATE is True:
+        if EXCLUDE_DUPLICATE is True or USE_BLACKLIST_AS_WHITELIST:
             with open("blacklist.txt", "r") as file:
                 BOOKS_I_HAVE = file.read()
-        else:
-            BOOKS_I_HAVE = ""
     except FileNotFoundError:
-        BOOKS_I_HAVE = ""
         print("ATENTIE: Nu ai creat fisierul blacklist.txt cu lista cartilor tale.")
 
     for book in books:
@@ -91,10 +91,25 @@ def get_category_details(category):
             "price": h_price,
         }
 
-        if EXCLUDE_DUPLICATE is True:
+        if EXCLUDE_DUPLICATE is True or USE_BLACKLIST_AS_WHITELIST is True:
             # Not perfect. TODO: improve this
-            if this_book['author'] in BOOKS_I_HAVE and this_book['title'] in BOOKS_I_HAVE:
-                print("EXCLUDED: ", this_book)
+            is_duplicate = False
+            if HARD_EXCLUDE is True:
+                if this_book['author'] in BOOKS_I_HAVE or this_book['title'] in BOOKS_I_HAVE:
+                    print("DUPLICATE: ", this_book)
+                    is_duplicate = True
+            else:
+                if this_book['author'] in BOOKS_I_HAVE and this_book['title'] in BOOKS_I_HAVE:
+                    print("DUPLICATE: ", this_book)
+                    is_duplicate = True
+
+            if EXCLUDE_DUPLICATE is True and is_duplicate is True:
+                continue
+
+            if HARD_EXCLUDE is True and is_duplicate is True:
+                continue
+
+            if USE_BLACKLIST_AS_WHITELIST is True and is_duplicate is False:
                 continue
 
         if LIMIT_MAX_PRICE is not None and h_price > LIMIT_MAX_PRICE:
@@ -142,3 +157,10 @@ def main():
     intro()
     list_categories()
     all_books = get_all_books()
+
+
+# TODO:
+# Option to filter the list of scraped books without downloading it every time.
+# Filter by language (exclude maghiar books for example).
+# Get publication year. Then option to filter by year.
+# levenshtein distance to be used for approx titles
