@@ -40,10 +40,38 @@ def get_category_details(category):
     url = url_category(category)
     magic_url = url + MAGIC_PARAMS
     html_doc = get_page_html(magic_url)
-    soup = BeautifulSoup(html_doc, 'html.parser')
-    books = soup.findAll("div", {"class": "hikashop_product"})
 
-    return category + " " + str(len(books))
+    soup = BeautifulSoup(html_doc, 'html.parser')
+
+    books = soup.findAll("div", {"class": "hikashop_product"})
+    books_list = []
+    for book in books:
+        book_link = book.find("span", {"class": "hikashop_product_name"}).find("a")
+        book_url = book_link.attrs['href']
+        book_title = book_link.text
+        try:
+            author = book.find(
+                    "dl", {"class": "hikashop_product_custom_autor_carte_line"}).find(
+                            "dd", {"class": "hikashop_product_custom_value"}).text
+        except Exception:
+            author = "???"
+
+        price = book.find("span", {"class": "hikashop_product_price_full"}).text
+
+        print(book_url)
+        print(book_title)
+        print(author)
+        print(price)
+        books_list.append({
+            "url": book_url,
+            "title": book_title,
+            "author": author,
+            "price": price,
+        })
+
+    return {
+        "books_list": books_list,
+    }
 
 def get_page_html(url):
     try:
