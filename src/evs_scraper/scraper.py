@@ -1,3 +1,6 @@
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+
 SITE = "https://viatasisanatate.ro"
 BASE = "/produse/carti/"
 BOOKS_CATEGORIES = [
@@ -34,7 +37,20 @@ def list_categories():
 
 def get_category_details(category):
     url = url_category(category)
+    html_doc = get_page_html(url)
+    soup = BeautifulSoup(html_doc, 'html.parser')
+
     return "Detalii pentru: " + human_readable_category(category) + " " + url
+
+def get_page_html(url):
+    try:
+        with urlopen(url) as response:
+            html_content = response.read().decode('utf-8')
+    except Exception as e:
+        print(f"Error: {e}")
+        html_content = None
+
+    return html_content
 
 def main():
     intro()
