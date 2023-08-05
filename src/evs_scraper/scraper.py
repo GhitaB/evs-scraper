@@ -19,6 +19,7 @@ BOOKS_CATEGORIES = [
     "fictiune",
 ]
 LIMIT_MAX_PRICE = None  # use None for no limit
+EXCLUDE_DUPLICATE = True  # True: include only books you don't have
 
 def human_readable_category(category):
     return category.capitalize().replace("-", " ")
@@ -57,6 +58,13 @@ def get_category_details(category):
 
     books = soup.findAll("div", {"class": "hikashop_product"})
     books_list = []
+
+    if EXCLUDE_DUPLICATE is True:
+        with open("blacklist.txt", "r") as file:
+            BOOKS_I_HAVE = file.read()
+    else:
+        BOOKS_I_HAVE = None
+
     for book in books:
         book_link = book.find("span", {"class": "hikashop_product_name"}).find("a")
         book_url = book_link.attrs['href'].strip()
@@ -72,15 +80,23 @@ def get_category_details(category):
         price = book.find("span", {"class": "hikashop_product_price_full"}).text
         h_price = float(price.replace(" lei ", "").split("lei")[-1].replace(",", "."))
 
-        if LIMIT_MAX_PRICE is not None and h_price > LIMIT_MAX_PRICE:
-            continue
-
-        books_list.append({
+        this_book = {
             "url": h_url,
             "title": book_title,
             "author": author,
             "price": h_price,
-        })
+        }
+
+        if EXCLUDE_DUPLICATE is True:
+            # Not perfect. TODO: improve this
+            if this_book['author'] in BOOKS_I_HAVE and this_book['title'] in BOOKS_I_HAVE:
+                print("EXCLUDED: ", this_book)
+                continue
+
+        if LIMIT_MAX_PRICE is not None and h_price > LIMIT_MAX_PRICE:
+            continue
+
+        books_list.append(this_book)
 
     return {
         "books_list": books_list,
