@@ -8,3 +8,4 @@ include/
 lib/
 local/
 share/
+src/evs_scraper/evs_scraper.egg-info/
