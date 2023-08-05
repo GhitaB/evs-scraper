@@ -20,14 +20,25 @@ def human_readable_category(category):
 def url_category(category):
     return SITE + BASE + category
 
-def main():
+def intro():
     print("---------------------------------------------------------------------------")
     print("Salut! Bun venit la", SITE)
     print("Esti omul care vrea toata lista de carti intr-o singura pagina? Rezolvam...")
     print("(Shh... Pe sub mana... Dar n-am incotro ca asa-s site-urile moderne.)")
-    print("---------------------------------------------------------------------------")
 
+def list_categories():
+    print("---------------------------------------------------------------------------")
     print("Categorii de carti: ")
     for category in BOOKS_CATEGORIES:
         print("-->", human_readable_category(category), " -- ", url_category(category))
-    print("---------------------------------------------------------------------------")
+
+def main():
+    intro()
+    list_categories()
+
+    # TODO
+    # get number of pages for each category
+    # get list of books
+    # get details for each book
+    # save final list (csv?):
+    #   category, year, author, title, number of pages, price, description
