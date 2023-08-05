@@ -32,9 +32,18 @@ def list_categories():
     for category in BOOKS_CATEGORIES:
         print("-->", human_readable_category(category), " -- ", url_category(category))
 
+def get_category_details(category):
+    url = url_category(category)
+    return "Detalii pentru: " + human_readable_category(category) + " " + url
+
 def main():
     intro()
     list_categories()
+
+    print("---------------------------------------------------------------------------")
+    for category in BOOKS_CATEGORIES:
+        details = get_category_details(category)
+        print(details)
 
     # TODO
     # get number of pages for each category
