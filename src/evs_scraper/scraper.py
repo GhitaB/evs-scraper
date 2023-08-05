@@ -3,7 +3,8 @@ from bs4 import BeautifulSoup
 
 SITE = "https://viatasisanatate.ro"
 BASE = "/produse/carti/"
-MAGIC_PARAMS = "?limitstart=0&limit=100000"
+# MAGIC_PARAMS = "?limitstart=0&limit=100000"
+MAGIC_PARAMS = "?limitstart=0&limit=100000&filter_Ordonare_6=price--lth"
 BOOKS_CATEGORIES = [
     "sanatate",
     "spiritualitate",
@@ -17,6 +18,7 @@ BOOKS_CATEGORIES = [
     "biografie",
     "fictiune",
 ]
+LIMIT_MAX_PRICE = None  # use None for no limit
 
 def human_readable_category(category):
     return category.capitalize().replace("-", " ")
@@ -69,6 +71,9 @@ def get_category_details(category):
 
         price = book.find("span", {"class": "hikashop_product_price_full"}).text
         h_price = float(price.replace(" lei ", "").split("lei")[-1].replace(",", "."))
+
+        if LIMIT_MAX_PRICE is not None and h_price > LIMIT_MAX_PRICE:
+            continue
 
         books_list.append({
             "url": h_url,
