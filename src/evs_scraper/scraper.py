@@ -47,23 +47,20 @@ def get_category_details(category):
     books_list = []
     for book in books:
         book_link = book.find("span", {"class": "hikashop_product_name"}).find("a")
-        book_url = book_link.attrs['href']
-        book_title = book_link.text
+        book_url = book_link.attrs['href'].strip()
+        h_url = SITE + book_url
+        book_title = book_link.text.strip()
         try:
             author = book.find(
                     "dl", {"class": "hikashop_product_custom_autor_carte_line"}).find(
-                            "dd", {"class": "hikashop_product_custom_value"}).text
+                            "dd", {"class": "hikashop_product_custom_value"}).text.strip()
         except Exception:
             author = "???"
 
         price = book.find("span", {"class": "hikashop_product_price_full"}).text
 
-        print(book_url)
-        print(book_title)
-        print(author)
-        print(price)
         books_list.append({
-            "url": book_url,
+            "url": h_url,
             "title": book_title,
             "author": author,
             "price": price,
@@ -88,13 +85,19 @@ def main():
     list_categories()
 
     print("---------------------------------------------------------------------------")
+    all_books = []
+    book_id = 1
     for category in BOOKS_CATEGORIES:
-        details = get_category_details(category)
-        print(details)
-
-    # TODO
-    # get number of pages for each category
-    # get list of books
-    # get details for each book
-    # save final list (csv?):
-    #   category, year, author, title, number of pages, price, description
+        h_category = human_readable_category(category)
+        books = get_category_details(category)['books_list']
+        for book in books:
+            print(
+                book_id,
+                h_category,
+                book['author'],
+                book['title'],
+                book['price'],
+                book['url']
+            )
+            all_books.append(book)
+            book_id += 1
