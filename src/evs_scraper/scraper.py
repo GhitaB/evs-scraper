@@ -59,11 +59,15 @@ def get_category_details(category):
     books = soup.findAll("div", {"class": "hikashop_product"})
     books_list = []
 
-    if EXCLUDE_DUPLICATE is True:
-        with open("blacklist.txt", "r") as file:
-            BOOKS_I_HAVE = file.read()
-    else:
-        BOOKS_I_HAVE = None
+    try:
+        if EXCLUDE_DUPLICATE is True:
+            with open("blacklist.txt", "r") as file:
+                BOOKS_I_HAVE = file.read()
+        else:
+            BOOKS_I_HAVE = ""
+    except FileNotFoundError:
+        BOOKS_I_HAVE = ""
+        print("ATENTIE: Nu ai creat fisierul blacklist.txt cu lista cartilor tale.")
 
     for book in books:
         book_link = book.find("span", {"class": "hikashop_product_name"}).find("a")
