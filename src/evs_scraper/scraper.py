@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 
 SITE = "https://viatasisanatate.ro"
 BASE = "/produse/carti/"
+MAGIC_PARAMS = "?limitstart=0&limit=100000"
 BOOKS_CATEGORIES = [
     "sanatate",
     "spiritualitate",
@@ -37,10 +38,12 @@ def list_categories():
 
 def get_category_details(category):
     url = url_category(category)
-    html_doc = get_page_html(url)
+    magic_url = url + MAGIC_PARAMS
+    html_doc = get_page_html(magic_url)
     soup = BeautifulSoup(html_doc, 'html.parser')
+    books = soup.findAll("div", {"class": "hikashop_product"})
 
-    return "Detalii pentru: " + human_readable_category(category) + " " + url
+    return category + " " + str(len(books))
 
 def get_page_html(url):
     try:
