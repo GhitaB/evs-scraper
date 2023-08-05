@@ -22,6 +22,7 @@ LIMIT_MAX_PRICE = None  # use None for no limit
 EXCLUDE_DUPLICATE = False  # True: include only books you don't have
 HARD_EXCLUDE = False  # True: use OR instead of AND in expression title-author
 USE_BLACKLIST_AS_WHITELIST = False  # True: if you want to see only the books you have
+SEARCH_PRINTRE_CARTI = True  # True: try to find the books on printrecarti.ro
 
 def human_readable_category(category):
     return category.capitalize().replace("-", " ")
@@ -46,7 +47,7 @@ def get_page_html(url):
         with urlopen(url) as response:
             html_content = response.read().decode('utf-8')
     except Exception as e:
-        print(f"Error: {e}")
+        # print(f"Error: {e}")
         html_content = None
 
     return html_content
@@ -153,14 +154,38 @@ def get_all_books():
     print("---------------------------------------------------------------------------")
     return all_books
 
+def search_printre_carti(all_books):
+    url = "https://www.printrecarti.ro/?cauta="
+
+    found_id = 1
+
+    for book in all_books:
+        title = book['title']
+        search_term = title.replace(" ", "+")
+
+        search_url = url + search_term
+        html_doc = get_page_html(search_url)
+        if html_doc is None:
+            continue
+
+        soup = BeautifulSoup(html_doc, 'html.parser')
+        not_found = soup.find("span", {"class": "nuexistaproduse"})
+
+        if not_found is None:
+            print(found_id, "PRINTRE CARTI: ", book['author'], book['title'], book['price'])
+            print(search_url)
+            found_id += 1
+
 def main():
     intro()
     list_categories()
     all_books = get_all_books()
-
+    if SEARCH_PRINTRE_CARTI is True:
+        search_printre_carti(all_books)
 
 # TODO:
 # Option to filter the list of scraped books without downloading it every time.
 # Filter by language (exclude maghiar books for example).
 # Get publication year. Then option to filter by year.
 # levenshtein distance to be used for approx titles
+# Show only in stock books at printre carti and compare prices
