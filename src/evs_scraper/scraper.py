@@ -36,6 +36,16 @@ def list_categories():
     for category in BOOKS_CATEGORIES:
         print("-->", human_readable_category(category), " -- ", url_category(category))
 
+def get_page_html(url):
+    try:
+        with urlopen(url) as response:
+            html_content = response.read().decode('utf-8')
+    except Exception as e:
+        print(f"Error: {e}")
+        html_content = None
+
+    return html_content
+
 def get_category_details(category):
     url = url_category(category)
     magic_url = url + MAGIC_PARAMS
@@ -58,34 +68,24 @@ def get_category_details(category):
             author = "???"
 
         price = book.find("span", {"class": "hikashop_product_price_full"}).text
+        h_price = float(price.replace(" lei ", "").split("lei")[-1].replace(",", "."))
 
         books_list.append({
             "url": h_url,
             "title": book_title,
             "author": author,
-            "price": price,
+            "price": h_price,
         })
 
     return {
         "books_list": books_list,
     }
 
-def get_page_html(url):
-    try:
-        with urlopen(url) as response:
-            html_content = response.read().decode('utf-8')
-    except Exception as e:
-        print(f"Error: {e}")
-        html_content = None
-
-    return html_content
-
-def main():
-    intro()
-    list_categories()
-
+def get_all_books():
     print("---------------------------------------------------------------------------")
     all_books = []
+    all_authors = []
+    total_price = 0
     book_id = 1
     for category in BOOKS_CATEGORIES:
         h_category = human_readable_category(category)
@@ -99,5 +99,21 @@ def main():
                 book['price'],
                 book['url']
             )
+            if book['author'] not in all_authors:
+                all_authors.append(book['author'])
             all_books.append(book)
+            total_price += book['price']
             book_id += 1
+
+    print("---------------------------------------------------------------------------")
+    print("Iata si lista tuturor autorilor:")
+    print(all_authors)
+    print("---------------------------------------------------------------------------")
+    print("PRET TOTAL, NUMAI ASTAZI, EVIDENT:", total_price, "lei")
+    print("---------------------------------------------------------------------------")
+    return all_books
+
+def main():
+    intro()
+    list_categories()
+    all_books = get_all_books()
