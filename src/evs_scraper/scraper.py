@@ -19,7 +19,7 @@ BOOKS_CATEGORIES = [
     "fictiune",
 ]
 LIMIT_MAX_PRICE = None  # use None for no limit
-EXCLUDE_DUPLICATE = False  # True: include only books you don't have
+EXCLUDE_DUPLICATE = True  # True: include only books you don't have
 HARD_EXCLUDE = False  # True: use OR instead of AND in expression title-author
 USE_BLACKLIST_AS_WHITELIST = False  # True: if you want to see only the books you have
 SEARCH_PRINTRE_CARTI = True  # True: try to find the books on printrecarti.ro
@@ -160,21 +160,20 @@ def search_printre_carti(all_books):
     found_id = 1
 
     for book in all_books:
-        title = book['title']
-        search_term = title.replace(" ", "+")
-
-        search_url = url + search_term
+        search_url = url + book['author'].replace(" ", "+") + "+" + book['title'].replace(" ", "+")
         html_doc = get_page_html(search_url)
         if html_doc is None:
             continue
 
         soup = BeautifulSoup(html_doc, 'html.parser')
-        not_found = soup.find("span", {"class": "nuexistaproduse"})
+        not_found_flag = soup.find("span", {"class": "nuexistaproduse"})
 
-        if not_found is None:
-            print(found_id, "PRINTRE CARTI: ", book['author'], book['title'], book['price'])
-            print(search_url)
-            found_id += 1
+        if not_found_flag is None:
+            product_details = soup.find("div", {"class": "produs"})
+            if "IN STOC" in product_details.text:
+                print(found_id, "PRINTRE CARTI: ", book['author'], book['title'], book['price'])
+                print(search_url)
+                found_id += 1
 
 def main():
     intro()
@@ -188,4 +187,3 @@ def main():
 # Filter by language (exclude maghiar books for example).
 # Get publication year. Then option to filter by year.
 # levenshtein distance to be used for approx titles
-# Show only in stock books at printre carti and compare prices
