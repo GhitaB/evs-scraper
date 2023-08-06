@@ -24,6 +24,7 @@ EXCLUDE_DUPLICATE = False  # True: include only books you don't have
 HARD_EXCLUDE = False  # True: use OR instead of AND in expression title-author
 USE_BLACKLIST_AS_WHITELIST = False  # True: see only the books you have
 SEARCH_PRINTRE_CARTI = True  # True: try to find the books on printrecarti.ro
+USE_SAVED_LIST = True  # False: download the list of books each time
 
 
 def human_readable_category(category):
@@ -213,19 +214,16 @@ def main():
     intro()
     list_categories()
 
-    try:
-        print("Incerc sa folosesc lista de carti descarcata deja...")
-        all_books = try_get_books_from_file()
-    except Exception:
-        print("Descarc lista proaspata de carti...")
+    if USE_SAVED_LIST is True:
+        try:
+            print("Incerc sa folosesc lista de carti descarcata deja...")
+            all_books = try_get_books_from_file()
+        except Exception:
+            print("Descarc lista proaspata de carti...")
+            all_books = get_all_books()
+    else:
         all_books = get_all_books()
 
     save_books_list(all_books)
     if SEARCH_PRINTRE_CARTI is True:
         search_printre_carti(all_books)
-
-# TODO:
-# Option to filter the list of scraped books without downloading it every time.
-# Filter by language (exclude maghiar books for example).
-# Get publication year. Then option to filter by year.
-# levenshtein distance to be used for approx titles
