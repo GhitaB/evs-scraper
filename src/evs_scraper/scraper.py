@@ -27,7 +27,7 @@ HARD_EXCLUDE = False  # True: use OR instead of AND in expression title-author
 USE_BLACKLIST_AS_WHITELIST = False  # True: see only the books you have
 SEARCH_PRINTRE_CARTI = False  # True: try to find the books on printrecarti.ro
 USE_SAVED_LIST = False  # False: download the list of books each time
-ONLY_DISCOUNTED = False  # True: show only discounted books
+ONLY_DISCOUNTED = True  # True: show only discounted books
 
 
 def human_readable_category(category):
@@ -171,6 +171,7 @@ def get_all_books():
                 h_category,
                 book['author'],
                 book['title'],
+                book['old_price'],
                 book['price'],
                 book['url']
             )
