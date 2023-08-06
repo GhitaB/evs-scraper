@@ -188,15 +188,6 @@ def get_all_books():
         h_category = human_readable_category(category)
         books = get_category_details(category)['books_list']
         for book in books:
-            print(
-                book_id,
-                h_category,
-                book['author'],
-                book['title'],
-                book['old_price'],
-                book['price'],
-                book['url']
-            )
 
             already_in_list = False
             for a_book in all_books:
@@ -210,6 +201,15 @@ def get_all_books():
             if not already_in_list:
                 all_books.append(book)
                 total_price += book['price']
+                print(
+                    book_id,
+                    h_category,
+                    book['author'],
+                    book['title'],
+                    book['old_price'],
+                    book['price'],
+                    book['url']
+                )
                 book_id += 1
 
     print("------------------------------------------------------------------")
