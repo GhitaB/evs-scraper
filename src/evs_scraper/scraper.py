@@ -248,7 +248,7 @@ def search_printre_carti(all_books):
 
 def save_books_list(all_books):
     with open('books.json', "w") as file:
-        json.dump(all_books, file)
+        json.dump(all_books, file, indent=4)
 
 
 def try_get_books_from_file():
