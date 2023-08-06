@@ -1,5 +1,6 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
+import json
 
 SITE = "https://viatasisanatate.ro"
 BASE = "/produse/carti/"
@@ -196,10 +197,30 @@ def search_printre_carti(all_books):
                 found_id += 1
 
 
+def save_books_list(all_books):
+    with open('books.json', "w") as file:
+        json.dump(all_books, file)
+
+
+def try_get_books_from_file():
+    with open('books.json', "r") as file:
+        all_books = json.load(file)
+
+    return all_books
+
+
 def main():
     intro()
     list_categories()
-    all_books = get_all_books()
+
+    try:
+        print("Incerc sa folosesc lista de carti descarcata deja...")
+        all_books = try_get_books_from_file()
+    except Exception:
+        print("Descarc lista proaspata de carti...")
+        all_books = get_all_books()
+
+    save_books_list(all_books)
     if SEARCH_PRINTRE_CARTI is True:
         search_printre_carti(all_books)
 

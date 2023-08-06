@@ -10,3 +10,4 @@ local/
 share/
 src/evs_scraper/evs_scraper.egg-info/
 blacklist.txt
+books.json
