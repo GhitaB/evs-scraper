@@ -28,6 +28,7 @@ USE_BLACKLIST_AS_WHITELIST = False  # True: see only the books you have
 SEARCH_PRINTRE_CARTI = False  # True: try to find the books on printrecarti.ro
 USE_SAVED_LIST = False  # False: download the list of books each time
 ONLY_DISCOUNTED = False  # True: show only discounted books
+ONLY_IN_STOCK = True  # True: exclude books that are not in stock
 
 
 def human_readable_category(category):
@@ -98,6 +99,13 @@ def get_category_details(category):
         except Exception:
             author = "???"
 
+        in_stock = True
+        stock_flag = book.find(
+            "span", {"class": "hikashop_product_stock_count"})
+        if stock_flag is not None:
+            if "Nu este" in stock_flag.text:
+                in_stock = False
+
         price = book.find(
             "span", {"class": "hikashop_product_price_full"}).text
         price_info = price.replace(" lei ", "")
@@ -118,6 +126,7 @@ def get_category_details(category):
             "price": h_price,
             "old_price": old_price,
             "is_discounted": is_discounted,
+            "in_stock": in_stock,
         }
 
         if EXCLUDE_DUPLICATE is True or USE_BLACKLIST_AS_WHITELIST is True:
@@ -142,6 +151,9 @@ def get_category_details(category):
 
             if USE_BLACKLIST_AS_WHITELIST is True and is_duplicate is False:
                 continue
+
+        if ONLY_IN_STOCK is True and this_book['in_stock'] is False:
+            continue
 
         if LIMIT_MAX_PRICE is not None and h_price > LIMIT_MAX_PRICE:
             continue
