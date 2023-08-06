@@ -4,10 +4,26 @@ import json
 
 SITE = "https://viatasisanatate.ro"
 BASE = "/produse/carti/"
+YEARS_FROM = "2022"
+YEARS_TO = "2023"
+LIMIT_MAX_PRICE = None  # use None for no limit
+EXCLUDE_DUPLICATE = True  # True: include only books you don't have
+HARD_EXCLUDE = False  # True: use OR instead of AND in expression title-author
+USE_BLACKLIST_AS_WHITELIST = False  # True: see only the books you have
+SEARCH_PRINTRE_CARTI = False  # True: try to find the books on printrecarti.ro
+USE_SAVED_LIST = False  # False: download the list of books each time
+ONLY_DISCOUNTED = False  # True: show only discounted books
+ONLY_IN_STOCK = True  # True: exclude books that are not in stock
+
 # MAGIC_PARAMS = "?limitstart=0&limit=100000"
 # MAGIC_PARAMS = "?limitstart=0&limit=100000&filter_Ordonare_6=price--lth"
+# MAGIC_PARAMS = ("?limitstart=0&limit=100000&filter_Ordonare_6=price--lth" +
+#                 "&filter_Limba_4=1")
 MAGIC_PARAMS = ("?limitstart=0&limit=100000&filter_Ordonare_6=price--lth" +
-                "&filter_Limba_4=1")
+                "&filter_Limba_4=1&filter_Anulapariiei_8=1" +
+                "&filter_Anulapariiei_8_values=" + YEARS_FROM +
+                ".00+-+" + YEARS_TO + ".00")
+
 BOOKS_CATEGORIES = [
     "sanatate",
     "spiritualitate",
@@ -21,14 +37,6 @@ BOOKS_CATEGORIES = [
     "biografie",
     "fictiune",
 ]
-LIMIT_MAX_PRICE = 50  # use None for no limit
-EXCLUDE_DUPLICATE = True  # True: include only books you don't have
-HARD_EXCLUDE = False  # True: use OR instead of AND in expression title-author
-USE_BLACKLIST_AS_WHITELIST = False  # True: see only the books you have
-SEARCH_PRINTRE_CARTI = False  # True: try to find the books on printrecarti.ro
-USE_SAVED_LIST = False  # False: download the list of books each time
-ONLY_DISCOUNTED = False  # True: show only discounted books
-ONLY_IN_STOCK = True  # True: exclude books that are not in stock
 
 
 def human_readable_category(category):
