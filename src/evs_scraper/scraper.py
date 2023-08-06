@@ -4,9 +4,9 @@ import json
 
 SITE = "https://viatasisanatate.ro"
 BASE = "/produse/carti/"
-YEARS_FROM = "2022"
+YEARS_FROM = "1990"
 YEARS_TO = "2023"
-LIMIT_MAX_PRICE = None  # use None for no limit
+LIMIT_MAX_PRICE = 60  # use None for no limit
 EXCLUDE_DUPLICATE = True  # True: include only books you don't have
 HARD_EXCLUDE = False  # True: use OR instead of AND in expression title-author
 USE_BLACKLIST_AS_WHITELIST = False  # True: see only the books you have
@@ -28,14 +28,14 @@ BOOKS_CATEGORIES = [
     "sanatate",
     "spiritualitate",
     "imnuri",
-    "copii",
+    # "copii",
     "familie",
     "dezvoltare-personala",
-    "pachete-de-carte",
+    # "pachete-de-carte",
     "cultura-generala",
     "poezie",
     "biografie",
-    "fictiune",
+    # "fictiune",
 ]
 
 
@@ -70,7 +70,6 @@ def get_page_html(url):
         e = e
         # print(f"Error: {e}")
         html_content = None
-
     return html_content
 
 
@@ -81,7 +80,10 @@ def get_category_details(category):
 
     soup = BeautifulSoup(html_doc, 'html.parser')
 
-    books = soup.findAll("div", {"class": "hikashop_product"})
+    books = soup.find(
+        "section", {"id": "g-container-main"}).findAll(
+        "div", {"class": "hikashop_product"})
+
     books_list = []
 
     BOOKS_I_HAVE = ""
