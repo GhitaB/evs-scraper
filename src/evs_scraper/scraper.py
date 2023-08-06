@@ -21,13 +21,13 @@ BOOKS_CATEGORIES = [
     "biografie",
     "fictiune",
 ]
-LIMIT_MAX_PRICE = None  # use None for no limit
-EXCLUDE_DUPLICATE = False  # True: include only books you don't have
+LIMIT_MAX_PRICE = 50  # use None for no limit
+EXCLUDE_DUPLICATE = True  # True: include only books you don't have
 HARD_EXCLUDE = False  # True: use OR instead of AND in expression title-author
 USE_BLACKLIST_AS_WHITELIST = False  # True: see only the books you have
 SEARCH_PRINTRE_CARTI = False  # True: try to find the books on printrecarti.ro
 USE_SAVED_LIST = False  # False: download the list of books each time
-ONLY_DISCOUNTED = True  # True: show only discounted books
+ONLY_DISCOUNTED = False  # True: show only discounted books
 
 
 def human_readable_category(category):
@@ -175,11 +175,20 @@ def get_all_books():
                 book['price'],
                 book['url']
             )
+
+            already_in_list = False
+            for a_book in all_books:
+                if a_book['author'] == book['author'] and \
+                        a_book['title'] == book['title']:
+                    already_in_list = True
+
             if book['author'] not in all_authors:
                 all_authors.append(book['author'])
-            all_books.append(book)
-            total_price += book['price']
-            book_id += 1
+
+            if not already_in_list:
+                all_books.append(book)
+                total_price += book['price']
+                book_id += 1
 
     print("------------------------------------------------------------------")
     print("Iata si lista tuturor autorilor:")
