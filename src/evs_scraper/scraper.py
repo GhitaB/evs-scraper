@@ -5,7 +5,9 @@ import json
 SITE = "https://viatasisanatate.ro"
 BASE = "/produse/carti/"
 # MAGIC_PARAMS = "?limitstart=0&limit=100000"
-MAGIC_PARAMS = "?limitstart=0&limit=100000&filter_Ordonare_6=price--lth"
+# MAGIC_PARAMS = "?limitstart=0&limit=100000&filter_Ordonare_6=price--lth"
+MAGIC_PARAMS = ("?limitstart=0&limit=100000&filter_Ordonare_6=price--lth" +
+                "&filter_Limba_4=1")
 BOOKS_CATEGORIES = [
     "sanatate",
     "spiritualitate",
@@ -23,8 +25,9 @@ LIMIT_MAX_PRICE = None  # use None for no limit
 EXCLUDE_DUPLICATE = False  # True: include only books you don't have
 HARD_EXCLUDE = False  # True: use OR instead of AND in expression title-author
 USE_BLACKLIST_AS_WHITELIST = False  # True: see only the books you have
-SEARCH_PRINTRE_CARTI = True  # True: try to find the books on printrecarti.ro
-USE_SAVED_LIST = True  # False: download the list of books each time
+SEARCH_PRINTRE_CARTI = False  # True: try to find the books on printrecarti.ro
+USE_SAVED_LIST = False  # False: download the list of books each time
+ONLY_DISCOUNTED = False  # True: show only discounted books
 
 
 def human_readable_category(category):
@@ -97,14 +100,24 @@ def get_category_details(category):
 
         price = book.find(
             "span", {"class": "hikashop_product_price_full"}).text
-        h_price = float(price.replace(" lei ", "").split(
-            "lei")[-1].replace(",", "."))
+        price_info = price.replace(" lei ", "")
+        if "lei" in price_info:
+            # discount detected
+            h_price = float(price_info.split("lei")[-1].replace(",", "."))
+            old_price = float(price_info.split("lei")[0].replace(",", "."))
+            is_discounted = True
+        else:
+            h_price = float(price_info.split("lei")[-1].replace(",", "."))
+            old_price = h_price
+            is_discounted = False
 
         this_book = {
             "url": h_url,
             "title": book_title,
             "author": author,
             "price": h_price,
+            "old_price": old_price,
+            "is_discounted": is_discounted,
         }
 
         if EXCLUDE_DUPLICATE is True or USE_BLACKLIST_AS_WHITELIST is True:
@@ -131,6 +144,9 @@ def get_category_details(category):
                 continue
 
         if LIMIT_MAX_PRICE is not None and h_price > LIMIT_MAX_PRICE:
+            continue
+
+        if ONLY_DISCOUNTED is True and this_book['is_discounted'] is False:
             continue
 
         books_list.append(this_book)
