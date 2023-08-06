@@ -19,7 +19,7 @@ BOOKS_CATEGORIES = [
     "fictiune",
 ]
 LIMIT_MAX_PRICE = None  # use None for no limit
-EXCLUDE_DUPLICATE = True  # True: include only books you don't have
+EXCLUDE_DUPLICATE = False  # True: include only books you don't have
 HARD_EXCLUDE = False  # True: use OR instead of AND in expression title-author
 USE_BLACKLIST_AS_WHITELIST = False  # True: if you want to see only the books you have
 SEARCH_PRINTRE_CARTI = True  # True: try to find the books on printrecarti.ro
